@@ -232,13 +232,13 @@
 
         <div class="section-title"><i class="fa-solid fa-desktop"></i> หน้าจอแสดงผลสถานะจริงจากบอร์ด</div>
         <div class="system-log-box" id="liveLogContent">
-            <pre style="margin:0; font-family:inherit; color:#000000; font-weight:600;">[SYSTEM] กำลังเชื่อมต่อ HiveMQ Broker...</pre>
+            <pre style="margin:0; font-family:inherit; color:#000000; font-weight:600;">[SYSTEM] กำลังเชื่อมต่อ EMQX Broker...</pre>
         </div>
     </div>
 
     <script>
-        // เปลี่ยน Broker เป็น HiveMQ Secure WebSocket (Port 8884)
-        const brokerUrl = 'wss://broker.hivemq.com:8884/mqtt';
+        // ใช้ WSS ของ EMQX Broker ทะลุเน็ต 5G มือถือ
+        const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
         const TOPIC_CONTROL = 'santayanon/home/control';
         const TOPIC_STATUS = 'santayanon/home/status';
 
@@ -251,29 +251,30 @@
             client = mqtt.connect(brokerUrl, {
                 clientId: 'web_' + Math.random().toString(16).substr(2, 8),
                 clean: true,
-                connectTimeout: 5000,
-                reconnectPeriod: 2000,
+                connectTimeout: 8000,
+                reconnectPeriod: 3000,
                 keepalive: 30
             });
         } catch (e) { console.error(e); }
 
         if (client) {
             client.on('connect', () => { 
-                console.log('Connected to HiveMQ Broker!');
-                client.subscribe(TOPIC_STATUS); 
+                console.log('Connected to EMQX WSS!');
+                client.subscribe(TOPIC_STATUS);
+                setOfflineUI('เชื่อมต่อ Broker สำเร็จ (กำลังรอสัญญาณจาก ESP32...)');
             });
-            client.on('offline', () => setOfflineUI('ขาดการเชื่อมต่อเครือข่าย'));
-            client.on('error', (err) => {
-                console.error(err);
-                setOfflineUI('เกิดข้อผิดพลาดในการเชื่อมต่อ');
-            });
+
+            client.on('offline', () => setOfflineUI('ขาดการเชื่อมต่อกับ Server'));
+            client.on('error', (err) => setOfflineUI('เกิดข้อผิดพลาดในการเชื่อมต่อ WSS'));
 
             client.on('message', (topic, payload) => {
                 if (topic === TOPIC_STATUS) {
                     clearTimeout(espTimeout);
                     setConnectedUI();
 
-                    espTimeout = setTimeout(() => { setOfflineUI('บอร์ด ESP32 ออฟไลน์'); }, 8000);
+                    espTimeout = setTimeout(() => { 
+                        setOfflineUI('ESP32 ขาดการติดต่อ (เช็กไฟเลี้ยงบอร์ด)'); 
+                    }, 8000);
 
                     try {
                         const data = JSON.parse(payload.toString());
@@ -315,7 +316,7 @@
                             if (ac.eco !== undefined) updateFeatureBtn('btnEco', ac.eco);
                             if (ac.fanSpeed !== undefined) {
                                 acDataState.fanSpeed = ac.fanSpeed;
-                                const speedTexts = ['อัตโนมัติ', 'เบอร์ 1', 'เบอร์ 2', 'เบอร์ 3'];
+                                const speedTexts = ['อัตโนมัติ', 'เบอร์ 1', 'เบอร์ 2', 'เบ8ร์ 3'];
                                 document.getElementById('fanSpeedText').innerText = speedTexts[ac.fanSpeed] || 'เบอร์ 2';
                             }
                         }
@@ -346,7 +347,7 @@
                         const logBox = document.getElementById('liveLogContent');
                         logBox.innerHTML = `<pre style="margin:0; font-family:inherit; white-space:pre; color:#000000; font-weight:600;">
 |=================================================================================|
-|                     HOME SMART SYSTEM MONITOR (ESP32 / PLC)                     |
+|                     HOME SMART SYSTEM MONITOR (EMQX BROKER)                     |
 |=================================================================================|
   LIGHTING SYSTEM:
     [1] ห้องนั่งเล่น : ${l[0] ? 'ON ' : 'OFF'}   [2] ห้องนอนใหญ่ : ${l[1] ? 'ON ' : 'OFF'}   [3] ห้องครัว : ${l[2] ? 'ON ' : 'OFF'}
@@ -370,37 +371,37 @@
         function setOfflineUI(reason) {
             document.getElementById('connectionStatus').className = 'live-badge waiting';
             document.getElementById('statusIcon').className = 'fa-solid fa-spinner fa-spin';
-            document.getElementById('statusText').innerText = 'รอสัญญาณ...';
-            document.getElementById('liveLogContent').innerHTML = `<pre style="color: #dc2626; font-weight: bold; margin:0; font-family:inherit;">[WARNING] ${reason}</pre>`;
+            document.getElementById('statusText').innerText = 'ออฟไลน์ / รอสัญญาณ...';
+            document.getElementById('liveLogContent').innerHTML = `<pre style="color: #dc2626; font-weight: bold; margin:0; font-family:inherit;">[STATUS] ${reason}</pre>`;
         }
 
         function controlLight(index) {
             const state = document.getElementById('light' + index).checked ? 1 : 0;
-            client.publish(TOPIC_CONTROL, `light${index}:${state}`);
+            if(client && client.connected) client.publish(TOPIC_CONTROL, `light${index}:${state}`);
         }
 
         function controlAC() {
             const state = document.getElementById('acToggle').checked ? 1 : 0;
-            client.publish(TOPIC_CONTROL, `ac_power:${state}`);
+            if(client && client.connected) client.publish(TOPIC_CONTROL, `ac_power:${state}`);
         }
 
         function adjustTemp(delta) {
             targetTemp = Math.min(Math.max(targetTemp + delta, 16), 30);
             document.getElementById('targetTemp').innerText = targetTemp;
-            client.publish(TOPIC_CONTROL, `ac_temp:${targetTemp}`);
+            if(client && client.connected) client.publish(TOPIC_CONTROL, `ac_temp:${targetTemp}`);
         }
 
         function toggleACFeature(feature) {
             acDataState[feature] = !acDataState[feature];
             updateFeatureBtn('btn' + feature.charAt(0).toUpperCase() + feature.slice(1), acDataState[feature]);
-            client.publish(TOPIC_CONTROL, `ac_${feature}:${acDataState[feature] ? 1 : 0}`);
+            if(client && client.connected) client.publish(TOPIC_CONTROL, `ac_${feature}:${acDataState[feature] ? 1 : 0}`);
         }
 
         function cycleFanSpeed() {
             acDataState.fanSpeed = (acDataState.fanSpeed + 1) % 4;
             const speedTexts = ['อัตโนมัติ', 'เบอร์ 1', 'เบอร์ 2', 'เบอร์ 3'];
             document.getElementById('fanSpeedText').innerText = speedTexts[acDataState.fanSpeed];
-            client.publish(TOPIC_CONTROL, `ac_fan:${acDataState.fanSpeed}`);
+            if(client && client.connected) client.publish(TOPIC_CONTROL, `ac_fan:${acDataState.fanSpeed}`);
         }
 
         function updateFeatureBtn(btnId, active) {
