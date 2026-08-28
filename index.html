@@ -19,9 +19,18 @@
         .indicator-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; display: inline-block; }
         .live-badge.online { border-color: #86efac; color: #15803d; background: #f0fdf4; box-shadow: 0 0 10px rgba(34,197,94,0.2); }
         .live-badge.waiting { border-color: #fde047; color: #b45309; background: #fefce8; }
+        .live-badge.offline { border-color: #fecaca; color: #dc2626; background: #fef2f2; }
         
         .section-title { font-size: 0.95rem; color: #475569; margin-bottom: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         
+        .system-status-bar { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.75rem 1rem; margin-bottom: 1.2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; }
+        .status-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 500; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .dot-ok { background: #22c55e; box-shadow: 0 0 4px #22c55e; }
+        .dot-warn { background: #f59e0b; box-shadow: 0 0 4px #f59e0b; }
+        .dot-fail { background: #ef4444; box-shadow: 0 0 4px #ef4444; }
+        .dot-unknown { background: #94a3b8; }
+
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; margin-bottom: 1.5rem; }
         .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1rem; transition: all 0.3s ease; position: relative; overflow: hidden; }
         
@@ -146,16 +155,26 @@
             </div>
         </div>
 
-        <div class="section-title"><i class="fa-solid fa-lightbulb"></i> ระบบไฟ (5 จุด)</div>
-        <div class="grid">
-            <div class="card" id="card-light1"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-couch"></i></div><input type="checkbox" id="light1" class="advanced-switch" onchange="controlLight(1)"></div><div class="card-title">ห้องนั่งเล่น</div><div class="card-status" id="status-light1">ปิด</div></div>
-            <div class="card" id="card-light2"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-bed"></i></div><input type="checkbox" id="light2" class="advanced-switch" onchange="controlLight(2)"></div><div class="card-title">ห้องนอนใหญ่</div><div class="card-status" id="status-light2">ปิด</div></div>
-            <div class="card" id="card-light3"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-utensils"></i></div><input type="checkbox" id="light3" class="advanced-switch" onchange="controlLight(3)"></div><div class="card-title">ห้องครัว</div><div class="card-status" id="status-light3">ปิด</div></div>
-            <div class="card" id="card-light4"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-bath"></i></div><input type="checkbox" id="light4" class="advanced-switch" onchange="controlLight(4)"></div><div class="card-title">ห้องน้ำ</div><div class="card-status" id="status-light4">ปิด</div></div>
-            <div class="card" id="card-light5"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-tree"></i></div><input type="checkbox" id="light5" class="advanced-switch" onchange="controlLight(5)"></div><div class="card-title">ระเบียงหน้าบ้าน</div><div class="card-status" id="status-light5">ปิด</div></div>
+        <div class="section-title"><i class="fa-solid fa-gauge-high"></i> สถานะระบบ</div>
+        <div class="system-status-bar">
+            <div class="status-item"><div id="st-wifi" class="status-dot dot-unknown"></div> WiFi: <span id="txt-wifi">รอสัญญาณ</span></div>
+            <div class="status-item"><div id="st-mqtt" class="status-dot dot-unknown"></div> MQTT: <span id="txt-mqtt">รอสัญญาณ</span></div>
+            <div class="status-item"><div id="st-dht" class="status-dot dot-unknown"></div> DHT22: <span id="txt-dht">รอสัญญาณ</span></div>
+            <div class="status-item"><div id="st-pzem" class="status-dot dot-unknown"></div> PZEM: <span id="txt-pzem">รอสัญญาณ</span></div>
+            <div class="status-item"><div id="st-ir" class="status-dot dot-ok"></div> IR: <span id="txt-ir">พร้อมทำงาน</span></div>
+            <div class="status-item"><div id="st-esp" class="status-dot dot-unknown"></div> ESP32: <span id="txt-esp">รอสัญญาณ</span></div>
         </div>
 
-        <div class="section-title"><i class="fa-solid fa-snowflake"></i> ระบบปรับอากาศ TCL (18,000 BTU) & พลังงาน</div>
+        <div class="section-title"><i class="fa-solid fa-lightbulb"></i> ระบบไฟ (5 จุด)</div>
+        <div class="grid">
+            <div class="card" id="card-light1"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-couch"></i></div><input type="checkbox" id="light1" class="advanced-switch" onchange="controlLight(1)"></div><div class="card-title">ห้องนั่งเล่น</div><div class="card-status" id="status-light1">⏸ ปิด</div></div>
+            <div class="card" id="card-light2"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-bed"></i></div><input type="checkbox" id="light2" class="advanced-switch" onchange="controlLight(2)"></div><div class="card-title">ห้องนอนใหญ่</div><div class="card-status" id="status-light2">⏸ ปิด</div></div>
+            <div class="card" id="card-light3"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-utensils"></i></div><input type="checkbox" id="light3" class="advanced-switch" onchange="controlLight(3)"></div><div class="card-title">ห้องครัว</div><div class="card-status" id="status-light3">⏸ ปิด</div></div>
+            <div class="card" id="card-light4"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-bath"></i></div><input type="checkbox" id="light4" class="advanced-switch" onchange="controlLight(4)"></div><div class="card-title">ห้องน้ำ</div><div class="card-status" id="status-light4">⏸ ปิด</div></div>
+            <div class="card" id="card-light5"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-tree"></i></div><input type="checkbox" id="light5" class="advanced-switch" onchange="controlLight(5)"></div><div class="card-title">ระเบียงหน้าบ้าน</div><div class="card-status" id="status-light5">⏸ ปิด</div></div>
+        </div>
+
+        <div class="section-title"><i class="fa-solid fa-snowflake"></i> ระบบปรับอากาศ TCL TAC-XAL18CH2 (18,000 BTU) & พลังงาน</div>
         <div class="ac-card" id="acCard">
             <div class="ac-top">
                 <div class="tcl-indoor-unit">
@@ -205,28 +224,28 @@
                     <span class="power-val"><span id="acAmpVal">0.00</span> A</span>
                 </div>
                 <div class="power-info-row" style="font-size: 0.78rem;">
-                    <span>ภาระการทำงาน (Load 12A = 100%)</span>
+                    <span>ภาระการทำงาน (Load 12.0A = 100%)</span>
                     <span id="acLoadPctVal">0%</span>
                 </div>
                 <div class="load-bar-bg">
                     <div class="load-bar-fill" id="acLoadBar"></div>
                 </div>
                 <div class="power-info-row" style="margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 6px;">
-                    <span><i class="fa-solid fa-calendar-day" style="color: #ec4899;"></i> พลังงานวันนี้ (Today Energy)</span>
-                    <span class="power-val" style="color: #ec4899;"><span id="acTodayKwhVal">0.000</span> kWh (<span id="acTodayCostVal">0.00</span> บาท)</span>
+                    <span><i class="fa-solid fa-calendar-day" style="color: #ec4899;"></i> พลังงานวันนี้</span>
+                    <span class="power-val" style="color: #ec4899;"><span id="acTodayKwhVal">0.000</span> kWh × 9 บาท = <b><span id="acTodayCostVal">0.00</span> บาท</b></span>
                 </div>
                 <div class="power-info-row">
-                    <span><i class="fa-solid fa-gauge" style="color: #10b981;"></i> พลังงานสะสมทั้งหมด (Total)</span>
-                    <span class="power-val" style="color: #10b981;"><span id="acKwhVal">0.000</span> kWh (<span id="acTotalCostVal">0.00</span> บาท)</span>
+                    <span><i class="fa-solid fa-gauge" style="color: #10b981;"></i> พลังงานสะสมทั้งหมด</span>
+                    <span class="power-val" style="color: #10b981;"><span id="acKwhVal">0.000</span> kWh × 9 บาท = <b><span id="acTotalCostVal">0.00</span> บาท</b></span>
                 </div>
             </div>
 
             <div class="ac-extra-features">
-                <button class="extra-btn" id="btnSwing" onclick="toggleACFeature('swing')"><i class="fa-solid fa-arrows-split-up-and-left"></i> สวิง (Swing)</button>
+                <button class="extra-btn" id="btnSwing" onclick="toggleACFeature('swing')"><i class="fa-solid fa-arrows-up-down"></i> สวิง: <span id="stSwing">ปิด</span></button>
                 <button class="extra-btn" id="btnFan" onclick="cycleFanSpeed()"><i class="fa-solid fa-wind"></i> พัดลม: <span id="fanSpeedText">เบอร์ 2</span></button>
-                <button class="extra-btn" id="btnTurbo" onclick="toggleACFeature('turbo')"><i class="fa-solid fa-gauge-high"></i> เทอร์โบ</button>
-                <button class="extra-btn" id="btnLight" onclick="toggleACFeature('light')"><i class="fa-solid fa-lightbulb"></i> ไฟจอแอร์</button>
-                <button class="extra-btn" id="btnEco" onclick="toggleACFeature('eco')" style="grid-column: span 2;"><i class="fa-solid fa-leaf"></i> ประหยัดไฟ (ECO)</button>
+                <button class="extra-btn" id="btnTurbo" onclick="toggleACFeature('turbo')"><i class="fa-solid fa-gauge-high"></i> เทอร์โบ: <span id="stTurbo">ปิด</span></button>
+                <button class="extra-btn" id="btnLight" onclick="toggleACFeature('light')"><i class="fa-solid fa-lightbulb"></i> ไฟจอ: <span id="stLight">เปิด</span></button>
+                <button class="extra-btn" id="btnEco" onclick="toggleACFeature('eco')" style="grid-column: span 2;"><i class="fa-solid fa-leaf"></i> ประหยัดไฟ ECO: <span id="stEco">ปิด</span></button>
             </div>
         </div>
 
@@ -237,7 +256,10 @@
     </div>
 
     <script>
-        // ใช้ WSS ของ EMQX Broker ทะลุเน็ต 5G มือถือ
+        const UNIT_RATE = 9.0;
+        const AC_MAX_AMP = 12.0;
+        const AC_RATED_WATT = 2100;
+
         const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
         const TOPIC_CONTROL = 'santayanon/home/control';
         const TOPIC_STATUS = 'santayanon/home/status';
@@ -247,9 +269,243 @@
         let targetTemp = 25;
         let acDataState = { swing: false, fanSpeed: 2, turbo: false, light: true, eco: false };
 
+        function setStatus(key, status, text) {
+            const dot = document.getElementById(`st-${key}`);
+            const txt = document.getElementById(`txt-${key}`);
+            if(!dot || !txt) return;
+            dot.className = 'status-dot';
+            if(status === 'ok') { dot.classList.add('dot-ok'); txt.textContent = text||'ทำงานปกติ'; }
+            else if(status === 'warn') { dot.classList.add('dot-warn'); txt.textContent = text||'ไม่เสถียร'; }
+            else if(status === 'fail') { dot.classList.add('dot-fail'); txt.textContent = text||'ไม่ทำงาน'; }
+            else { dot.classList.add('dot-unknown'); txt.textContent = text||'รอสัญญาณ'; }
+        }
+
         try {
             client = mqtt.connect(brokerUrl, {
                 clientId: 'web_' + Math.random().toString(16).substr(2, 8),
                 clean: true,
                 connectTimeout: 8000,
-           
+                reconnectPeriod: 3000,
+                keepalive: 30
+            });
+        } catch (e) { console.error(e); }
+
+        if (client) {
+            client.on('connect', () => { 
+                console.log('Connected to EMQX WSS!');
+                setStatus('mqtt', 'ok', 'เชื่อมต่อแล้ว');
+                setOfflineUI('เชื่อมต่อ Broker สำเร็จ (กำลังรอสัญญาณจาก ESP32...)');
+                client.subscribe(TOPIC_STATUS);
+            });
+
+            client.on('offline', () => {
+                setStatus('mqtt', 'fail', 'ขาดการเชื่อมต่อ');
+                setOfflineUI('ขาดการเชื่อมต่อกับ Server');
+            });
+            client.on('error', (err) => {
+                setStatus('mqtt', 'warn', 'เกิดข้อผิดพลาด');
+                setOfflineUI('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            });
+
+            client.on('message', (topic, payload) => {
+                if (topic === TOPIC_STATUS) {
+                    clearTimeout(espTimeout);
+                    setConnectedUI();
+                    setStatus('esp', 'ok', 'ออนไลน์');
+
+                    espTimeout = setTimeout(() => { 
+                        setStatus('esp', 'fail', 'ขาดการติดต่อ');
+                        setOfflineUI('ESP32 ขาดการติดต่อ'); 
+                    }, 10000);
+
+                    try {
+                        const data = JSON.parse(payload.toString());
+                        console.log('รับข้อมูล:', data);
+
+                        if(data.sys) {
+                            setStatus('wifi', data.sys.wifi ? 'ok' : 'fail', data.sys.wifi ? 'เชื่อมต่อ' : 'ไม่ต่อ');
+                            setStatus('dht', data.sys.dht ? 'ok' : 'fail', data.sys.dht ? 'อ่านได้' : 'อ่านไม่ได้');
+                            setStatus('pzem', data.sys.pzem ? 'ok' : 'fail', data.sys.pzem ? 'อ่านได้' : 'อ่านไม่ได้');
+                        }
+
+                        if (data.lights && Array.isArray(data.lights)) {
+                            for (let i = 0; i < 5; i++) {
+                                const state = !!data.lights[i];
+                                const switchEl = document.getElementById('light' + (i + 1));
+                                const card = document.getElementById('card-light' + (i + 1));
+                                const statusText = document.getElementById('status-light' + (i + 1));
+                                if (switchEl) switchEl.checked = state;
+                                if (card) {
+                                    if (state) { card.classList.add('active'); if (statusText) statusText.innerText = '✅ เปิดทำงาน'; } 
+                                    else { card.classList.remove('active'); if (statusText) statusText.innerText = '⏸ ปิด'; }
+                                }
+                            }
+                        }
+
+                        if (data.ac) {
+                            const ac = data.ac;
+                            const acCard = document.getElementById('acCard');
+                            const acToggle = document.getElementById('acToggle');
+                            
+                            if (acToggle) acToggle.checked = !!ac.power;
+                            if (acCard) {
+                                if (ac.power) acCard.classList.add('active');
+                                else acCard.classList.remove('active');
+                            }
+
+                            if (ac.temp !== undefined) {
+                                targetTemp = ac.temp;
+                                document.getElementById('targetTemp').innerText = targetTemp;
+                                document.getElementById('tclDispTemp').innerText = ac.power ? targetTemp : '--';
+                            }
+
+                            updateFeatureBtn('btnSwing', 'stSwing', ac.swing);
+                            updateFeatureBtn('btnTurbo', 'stTurbo', ac.turbo);
+                            updateFeatureBtn('btnLight', 'stLight', ac.light);
+                            updateFeatureBtn('btnEco', 'stEco', ac.eco);
+                            if (ac.fanSpeed !== undefined) {
+                                acDataState.fanSpeed = ac.fanSpeed;
+                                const speedTexts = ['อัตโนมัติ', 'เบอร์ 1', 'เบอร์ 2', 'เบอร์ 3'];
+                                document.getElementById('fanSpeedText').innerText = speedTexts[ac.fanSpeed] || 'เบอร์ 2';
+                            }
+                        }
+
+                        if (data.sensorTemp !== undefined && data.sensorTemp > -40) {
+                            document.getElementById('realTemp').innerText = data.sensorTemp.toFixed(1) + '°C';
+                            setStatus('dht', 'ok', 'ทำงานปกติ');
+                        } else { setStatus('dht', 'fail', 'อ่านไม่ได้'); }
+                        if (data.sensorHum !== undefined && data.sensorHum > 0) {
+                            document.getElementById('realHum').innerText = data.sensorHum.toFixed(1) + '%';
+                        }
+
+                        let todayKwh = 0, totalKwh = 0, todayCost = 0, totalCost = 0;
+                        if (data.power) {
+                            const p = data.power;
+                            const amp = p.amp !== undefined ? p.amp : 0;
+                            const loadPct = Math.min(Math.round((amp / AC_MAX_AMP) * 100), 100);
+                            todayKwh = p.todayKwh || 0;
+                            totalKwh = p.totalKwh || 0;
+                            todayCost = todayKwh * UNIT_RATE;
+                            totalCost = totalKwh * UNIT_RATE;
+
+                            if(p.volt !== undefined && p.amp !== undefined && p.amp >= 0) {
+                                setStatus('pzem', 'ok', 'ทำงานปกติ');
+                                document.getElementById('acVoltVal').innerText = p.volt.toFixed(1);
+                            } else { setStatus('pzem', 'fail', 'อ่านไม่ได้'); }
+
+                            document.getElementById('acAmpVal').innerText = amp.toFixed(2);
+                            document.getElementById('acLoadPctVal').innerText = loadPct + '%';
+                            document.getElementById('acLoadBar').style.width = loadPct + '%';
+                            document.getElementById('acTodayKwhVal').innerText = todayKwh.toFixed(3);
+                            document.getElementById('acTodayCostVal').innerText = todayCost.toFixed(2);
+                            document.getElementById('acKwhVal').innerText = totalKwh.toFixed(3);
+                            document.getElementById('acTotalCostVal').innerText = totalCost.toFixed(2);
+                        }
+
+                        const l = data.lights || [0,0,0,0,0];
+                        const logBox = document.getElementById('liveLogContent');
+                        logBox.innerHTML = `<pre style="margin:0; font-family:inherit; white-space:pre; color:#000000; font-weight:600;">
+|=================================================================================|
+|                     HOME SANTAYANON — SYSTEM STATUS MONITOR                      |
+|=================================================================================|
+  📡 WIFI      : ${data.sys?.wifi ? '✅ เชื่อมต่อ' : '❌ ไม่เชื่อมต่อ'}
+  📤 MQTT      : ✅ เชื่อมต่อและรับสัญญาณ
+  🌡️ DHT22     : ${data.sensorTemp ? '✅ ทำงาน ' + data.sensorTemp.toFixed(1)+'°C / '+data.sensorHum.toFixed(1)+'%' : '❌ ไม่อ่านค่า'}
+  ⚡ PZEM-004T  : ${data.power?.amp !== undefined ? '✅ ทำงาน ' + data.power.amp.toFixed(2)+' A' : '❌ ไม่อ่านค่า'}
+  📡 IR ส่งแอร์: ✅ พร้อมทำงาน
+  🟢 ESP32     : ✅ ออนไลน์
+
+  💡 ระบบไฟ 5 จุด:
+    [1] ห้องนั่งเล่น : ${l[0] ? '✅ เปิดทำงาน' : '⏸ ปิด       '}
+    [2] ห้องนอนใหญ่   : ${l[1] ? '✅ เปิดทำงาน' : '⏸ ปิด       '}
+    [3] ห้องครัว      : ${l[2] ? '✅ เปิดทำงาน' : '⏸ ปิด       '}
+    [4] ห้องน้ำ       : ${l[3] ? '✅ เปิดทำงาน' : '⏸ ปิด       '}
+    [5] ระเบียง       : ${l[4] ? '✅ เปิดทำงาน' : '⏸ ปิด       '}
+
+  ❄️ แอร์ TCL TAC-XAL18CH2 (18,000 BTU):
+    สถานะแอร์   : ${data.ac?.power ? '✅ เปิดทำงาน' : '⏸ ปิด       '}
+    อุณหภูมิ     : ${data.ac?.temp || 25}°C
+    สวิง         : ${data.ac?.swing ? '✅ เปิด' : '⏸ ปิด'}
+    พัดลม        : ${['อัตโนมัติ','เบอร์ 1','เบอร์ 2','เบอร์ 3'][data.ac?.fanSpeed||2]}
+    เทอร์โบ      : ${data.ac?.turbo ? '✅ เปิด' : '⏸ ปิด'}
+    ไฟจอแอร์     : ${data.ac?.light !== false ? '✅ เปิด' : '⏸ ปิด'}
+    ECO ประหยัด  : ${data.ac?.eco ? '✅ เปิด' : '⏸ ปิด'}
+
+  ⚡ พลังงานและค่าไฟ (คิดหน่วยละ 9 บาท):
+    แรงดัน: ${data.power?.volt ? data.power.volt.toFixed(1)+' V' : '--'}
+    กระแส: ${data.power?.amp ? data.power.amp.toFixed(2)+' A' : '--'}
+    ภาระงาน: ${data.power?.amp ? Math.min(Math.round((data.power.amp/12)*100),100)+'%' : '--'}
+    วันนี้: ${todayKwh.toFixed(3)} kWh = ${todayCost.toFixed(2)} บาท
+    รวมทั้งหมด: ${totalKwh.toFixed(3)} kWh = ${totalCost.toFixed(2)} บาท
+|=================================================================================|</pre>`;
+                    } catch (e) { console.error('JSON Error:', e); }
+                }
+            });
+        }
+
+        function setConnectedUI() {
+            document.getElementById('connectionStatus').className = 'live-badge online';
+            document.getElementById('statusIcon').className = 'indicator-dot';
+            document.getElementById('statusText').innerText = 'เชื่อมต่อแล้ว (Online)';
+        }
+
+        function setOfflineUI(reason) {
+            document.getElementById('connectionStatus').className = 'live-badge offline';
+            document.getElementById('statusIcon').className = 'fa-solid fa-triangle-exclamation';
+            document.getElementById('statusText').innerText = 'ออฟไลน์';
+            document.getElementById('liveLogContent').innerHTML = `<pre style="color:#dc2626;font-weight:bold;margin:0;font-family:inherit;">[STATUS] ${reason}</pre>`;
+        }
+
+        function updateFeatureBtn(btnId, spanId, active) {
+            const btn = document.getElementById(btnId);
+            const span = document.getElementById(spanId);
+            if (btn) active ? btn.classList.add('active') : btn.classList.remove('active');
+            if (span) span.textContent = active ? 'เปิด' : 'ปิด';
+        }
+
+        function controlLight(index) {
+            const state = document.getElementById('light' + index).checked ? 1 : 0;
+            if(client && client.connected) {
+                client.publish(TOPIC_CONTROL, 'light' + index + ':' + state);
+                console.log('ส่ง: light' + index + ':' + state);
+            }
+        }
+
+        function controlAC() {
+            const state = document.getElementById('acToggle').checked ? 1 : 0;
+            if(client && client.connected) {
+                client.publish(TOPIC_CONTROL, 'ac_power:' + state);
+                console.log('ส่ง: ac_power:' + state);
+            }
+        }
+
+        function adjustTemp(delta) {
+            targetTemp = Math.min(Math.max(targetTemp + delta, 16), 30);
+            document.getElementById('targetTemp').innerText = targetTemp;
+            if(client && client.connected) {
+                client.publish(TOPIC_CONTROL, 'ac_temp:' + targetTemp);
+                console.log('ส่ง: ac_temp:' + targetTemp);
+            }
+        }
+
+        function toggleACFeature(feature) {
+            acDataState[feature] = !acDataState[feature];
+            updateFeatureBtn('btn' + feature.charAt(0).toUpperCase() + feature.slice(1), 'st' + feature.charAt(0).toUpperCase() + feature.slice(1), acDataState[feature]);
+            if(client && client.connected) {
+                client.publish(TOPIC_CONTROL, 'ac_' + feature + ':' + (acDataState[feature] ? 1 : 0));
+                console.log('ส่ง: ac_' + feature + ':' + (acDataState[feature] ? 1 : 0));
+            }
+        }
+
+        function cycleFanSpeed() {
+            acDataState.fanSpeed = (acDataState.fanSpeed + 1) % 4;
+            const speedTexts = ['อัตโนมัติ', 'เบอร์ 1', 'เบอร์ 2', 'เบอร์ 3'];
+            document.getElementById('fanSpeedText').innerText = speedTexts[acDataState.fanSpeed];
+            if(client && client.connected) {
+                client.publish(TOPIC_CONTROL, 'ac_fan:' + acDataState.fanSpeed);
+                console.log('ส่ง: ac_fan:' + acDataState.fanSpeed);
+            }
+        }
+    </script>
+</body>
+</html>
