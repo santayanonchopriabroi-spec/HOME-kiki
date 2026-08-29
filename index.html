@@ -237,13 +237,9 @@
     </div>
 
     <script>
-        const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
-        let client;
-        let espTimeout = null;
-        let targetTemp = 25;
-        let acDataState = { swing: false, fanSpeed: 2, turbo: false, light: true, eco: false };
-
-        try {
+        const BROKER_URL = 'wss://broker.emqx.io:8084/mqtt';
+ const TOPIC_STATUS = 'santayanon/home/status';
+ const TOPIC_CONTROL = 'santayanon/home/control';
             client = mqtt.connect(brokerUrl, {
                 clientId: 'web_' + Math.random().toString(16).substr(2, 8),
                 clean: true,
