@@ -237,15 +237,14 @@
     </div>
 
     <script>
-      // ✅ แก้ไขแล้ว — ชื่อตรงกัน 100%
-const BROKER_URL = 'wss://broker.emqx.io:8084/mqtt';
+      const BROKER_URL = 'wss://broker.emqx.io:8084/mqtt';
 const TOPIC_STATUS = 'santayanon/home/status';
 const TOPIC_CONTROL = 'santayanon/home/control';
 
-let client = null;          // ✅ แก้จาก "ient" เป็น "client"
-let isConnected = false;    // ✅ แก้ตัวพิมพ์ + ประกาศให้ถูกต้อง
+let client = null;
+let isConnected = false;
 
-client = mqtt.connect(BROKER_URL, {  // ✅ ใช้ BROKER_URL ตรงกับที่ประกาศ
+client = mqtt.connect(BROKER_URL, {
     clientId: 'web_' + Math.random().toString(16).substr(2, 8),
     clean: true,
     connectTimeout: 8000,
