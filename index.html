@@ -237,11 +237,7 @@
     </div>
 
     <script>
-        // ===== HMI / เว็บ =====
-const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
-const TOPIC_STATUS = 'santayanon/home/status';
-const TOPIC_CONTROL = 'santayanon/home/control';
-
+        const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
         let client;
         let espTimeout = null;
         let targetTemp = 25;
