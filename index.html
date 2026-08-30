@@ -118,7 +118,71 @@
             box-shadow: 0 0 12px rgba(16,185,129,0.4);
         }
         
-        .system-log-box { background: #f8fafc; color: #000000; border-radius: 16px; padding: 0.8rem; font-family: 'Courier New', Courier, monospace; font-size: 0.72rem; line-height: 1.35; min-height: 250px; max-height: 420px; overflow-y: auto; overflow-x: auto; border: 2px solid #cbd5e1; -webkit-overflow-scrolling: touch; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        /* ✅ ส่วนใหม่: การ์ดแสดงสถานะบอร์ดจริงครบทุกค่า */
+        .board-status-card {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 16px;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            border: 2px solid #334155;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .board-section-title {
+            color: #38bdf8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.6rem;
+            margin-bottom: 0.3rem;
+            padding-bottom: 0.2rem;
+            border-bottom: 1px dashed #334155;
+            font-size: 0.72rem;
+        }
+        .board-section-title:first-child { margin-top: 0; }
+        .board-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.15rem 0;
+        }
+        .board-label { color: #94a3b8; }
+        .board-val { font-weight: 700; color: #ffffff; }
+        .board-val.on { color: #22c55e; }
+        .board-val.off { color: #ef4444; }
+        .board-val.temp { color: #fbbf24; }
+        .board-val.hum { color: #38bdf8; }
+        .board-val.volt { color: #a78bfa; }
+        .board-val.amp { color: #34d399; }
+        .board-val.load-high { color: #ef4444; }
+        .board-val.load-mid { color: #fbbf24; }
+        .board-val.load-low { color: #22c55e; }
+        .board-val.cost { color: #f472b6; }
+        .board-lights { display: flex; gap: 0.6rem; justify-content: flex-end; }
+        .board-light-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: #334155;
+            border: 1px solid #475569;
+        }
+        .board-light-dot.active {
+            background: #0ea5e9;
+            box-shadow: 0 0 6px #0ea5e9;
+            border-color: #38bdf8;
+        }
+        .board-log-box {
+            background: #020617;
+            color: #22c55e;
+            border-radius: 8px;
+            padding: 0.6rem;
+            margin-top: 0.6rem;
+            font-size: 0.7rem;
+            max-height: 140px;
+            overflow-y: auto;
+            border: 1px solid #1e293b;
+        }
+        .board-log-box pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
         
         @media (min-width: 768px) {
             body { padding: 1rem; }
@@ -130,7 +194,7 @@
             .ac-top { flex-direction: row; }
             .ac-controls { width: auto; padding: 1.2rem 2rem; border-radius: 60px; flex-wrap: nowrap; }
             .ac-extra-features { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-            .system-log-box { font-size: 0.85rem; padding: 1.2rem; border-radius: 20px; }
+            .board-status-card { font-size: 0.85rem; padding: 1.2rem; border-radius: 20px; }
         }
     </style>
 </head>
@@ -217,37 +281,4 @@
                 </div>
                 <div class="power-info-row">
                     <span><i class="fa-solid fa-gauge" style="color: #10b981;"></i> พลังงานสะสมทั้งหมด (Total)</span>
-                    <span class="power-val" style="color: #10b981;"><span id="acKwhVal">0.000</span> kWh (<span id="acTotalCostVal">0.00</span> บาท)</span>
-                </div>
-            </div>
-
-            <div class="ac-extra-features">
-                <button class="extra-btn" id="btnSwing" onclick="toggleACFeature('swing')"><i class="fa-solid fa-arrows-split-up-and-left"></i> สวิง (Swing)</button>
-                <button class="extra-btn" id="btnFan" onclick="cycleFanSpeed()"><i class="fa-solid fa-wind"></i> พัดลม: <span id="fanSpeedText">เบอร์ 2</span></button>
-                <button class="extra-btn" id="btnTurbo" onclick="toggleACFeature('turbo')"><i class="fa-solid fa-gauge-high"></i> เทอร์โบ</button>
-                <button class="extra-btn" id="btnLight" onclick="toggleACFeature('light')"><i class="fa-solid fa-lightbulb"></i> ไฟจอแอร์</button>
-                <button class="extra-btn" id="btnEco" onclick="toggleACFeature('eco')" style="grid-column: span 2;"><i class="fa-solid fa-leaf"></i> ประหยัดไฟ (ECO)</button>
-            </div>
-        </div>
-
-        <div class="section-title"><i class="fa-solid fa-desktop"></i> หน้าจอแสดงผลสถานะจริงจากบอร์ด</div>
-        <div class="system-log-box" id="liveLogContent">
-            <pre style="margin:0; font-family:inherit; color:#000000; font-weight:600;">[SYSTEM] กำลังเชื่อมต่อ MQTT Broker...</pre>
-        </div>
-    </div>
-
-    <script>
-      const BROKER_URL = 'wss://broker.emqx.io:8084/mqtt';
-const TOPIC_STATUS = 'santayanon/home/status';
-const TOPIC_CONTROL = 'santayanon/home/control';
-
-let client = null;
-let isConnected = false;
-
-client = mqtt.connect(BROKER_URL, {
-    clientId: 'web_' + Math.random().toString(16).substr(2, 8),
-    clean: true,
-    connectTimeout: 8000,
-    reconnectPeriod: 3000,
-    keepalive: 30
-});
+   
